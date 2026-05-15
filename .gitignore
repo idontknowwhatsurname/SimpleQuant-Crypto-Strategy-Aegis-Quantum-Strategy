@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Data
+data/
+*.csv
+*.json
+*.png
+*.html
+
+# Specific AQS data
+accuracy.json
+backtest_results.csv
+user_real_data.csv
+comprehensive_report.png
+dashboard.html
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store

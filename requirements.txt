@@ -20,6 +20,10 @@ matplotlib>=3.7
 
 # 配置管理
 tomli>=2.0; python_version < "3.11"
+appdirs>=1.4.4
+
+# Web GUI
+flask>=3.0
 
 # Textual TUI (Reasonix 风格界面)
 textual>=0.41.0

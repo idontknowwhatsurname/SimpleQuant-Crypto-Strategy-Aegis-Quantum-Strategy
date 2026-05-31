@@ -3,7 +3,7 @@
 # 使用 PyInstaller 打包为独立 .app
 # 
 # 前置条件:
-#   pip install textual rich pyinstaller
+#   pip install flask pyinstaller
 #
 set -e
 
@@ -37,12 +37,12 @@ if ! python3 -c "import PyInstaller" 2>/dev/null; then
 fi
 echo "  ✅ PyInstaller"
 
-# Textual
-if ! python3 -c "import textual" 2>/dev/null; then
-    echo "  ⏳ 安装 Textual..."
-    pip3 install textual rich
+# Flask
+if ! python3 -c "import flask" 2>/dev/null; then
+    echo "  ⏳ 安装 Flask..."
+    pip3 install flask
 fi
-echo "  ✅ Textual"
+echo "  ✅ Flask"
 
 echo ""
 
@@ -53,15 +53,18 @@ rm -rf "$BUILD_DIR" "$DMG_NAME" dist
 # 构建 .app
 echo "📦 使用 PyInstaller 构建 .app..."
 python3 -m PyInstaller \
-    --name "AIQuant Engine" \
-    --onefile \
+    --clean \
+    -y \
     --windowed \
+    --name "AIQuant Engine" \
     --add-data "exchange:exchange" \
     --add-data "notify:notify" \
     --add-data "review:review" \
     --add-data "evolution:evolution" \
     --add-data "goal:goal" \
     --add-data "mcp:mcp" \
+    --add-data "gui/templates:gui/templates" \
+    --add-data "gui/static:gui/static" \
     --add-data "config.toml.example:." \
     --add-data "README.md:." \
     --add-data "README_CN.md:." \
@@ -89,21 +92,14 @@ python3 -m PyInstaller \
     --hidden-import "evolution.manager" \
     --hidden-import "goal.planner" \
     --hidden-import "mcp.prompt_bar" \
-    --hidden-import "textual" \
-    --hidden-import "rich" \
-    --collect-all "textual" \
-    --collect-all "rich" \
-    --collect-all "exchange" \
-    --collect-all "notify" \
-    --collect-all "review" \
-    --collect-all "evolution" \
-    --collect-all "goal" \
-    --collect-all "mcp" \
+    --hidden-import "appdirs" \
     --exclude "tkinter" \
     --exclude "matplotlib" \
     --exclude "scipy" \
     --exclude "cv2" \
-    gui/tui.py
+    --exclude-module "pkg_resources" \
+    --exclude-module "setuptools" \
+    launcher.py
 
 # 检查构建结果
 if [ ! -d "dist/AIQuant Engine.app" ]; then

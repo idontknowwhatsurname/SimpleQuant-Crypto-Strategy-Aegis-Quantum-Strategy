@@ -1,76 +1,58 @@
-"""
-AIQuant Engine - macOS 应用启动器
-用于在 macOS 上启动 Web GUI
-"""
-import subprocess
+"""AIQuant Engine - macOS 应用启动器."""
+import socket
 import sys
-import webbrowser
+import threading
 import time
-import os
+import urllib.error
+import urllib.request
+import webbrowser
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-def check_python():
-    """检查 Python 版本"""
-    if sys.version_info < (3, 10):
-        print("❌ 需要 Python 3.10 或更高版本")
-        print(f"   当前版本: {sys.version}")
-        sys.exit(1)
+from gui.app import app
 
 
-def check_dependencies():
-    """检查依赖是否安装"""
-    try:
-        import flask
-        print("✅ Flask 已安装")
-    except ImportError:
-        print("⚠️ Flask 未安装，正在安装...")
-        subprocess.run([sys.executable, "-m", "pip", "install", "flask"], check=True)
+def choose_port(preferred: int = 5000) -> int:
+    """选择一个可用端口，优先使用 5000。"""
+    for port in (preferred, 5001, 5002, 8000):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if sock.connect_ex(("127.0.0.1", port)) != 0:
+                return port
+    raise RuntimeError("没有找到可用端口")
 
 
-def start_gui():
-    """启动 Web GUI"""
-    app_path = Path(__file__).parent / "gui" / "app.py"
-    
-    if not app_path.exists():
-        print(f"❌ 找不到 GUI 应用: {app_path}")
-        sys.exit(1)
-    
-    print("🚀 启动 AIQuant Engine...")
-    print("   访问地址: http://localhost:5000")
-    print("   按 Ctrl+C 停止")
-    print("")
-    
-    # 启动 Flask 应用
-    process = subprocess.Popen(
-        [sys.executable, str(app_path)],
-        cwd=str(Path(__file__).parent)
-    )
-    
-    # 等待服务器启动
-    time.sleep(2)
-    
-    # 打开浏览器
-    webbrowser.open("http://localhost:5000")
-    
-    try:
-        process.wait()
-    except KeyboardInterrupt:
-        print("\n🛑 停止 AIQuant Engine...")
-        process.terminate()
-        process.wait()
+def wait_for_server(url: str, timeout: float = 20.0) -> None:
+    """等待本地服务器就绪，然后打开浏览器。"""
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            with urllib.request.urlopen(f"{url}/api/status", timeout=1.5) as resp:
+                if resp.status == 200:
+                    webbrowser.open(url)
+                    return
+        except (urllib.error.URLError, TimeoutError):
+            time.sleep(0.3)
+    webbrowser.open(url)
 
 
 def main():
-    """主函数"""
+    """主函数。"""
+    port = choose_port()
+    url = f"http://127.0.0.1:{port}"
+    opener = threading.Thread(target=wait_for_server, args=(url,), daemon=True)
+    opener.start()
+
     print("=" * 50)
     print("🛡️ AIQuant Engine - macOS 启动器")
     print("=" * 50)
-    print("")
-    
-    check_python()
-    check_dependencies()
-    start_gui()
+    print(f"访问地址: {url}")
+    print("=" * 50)
+
+    app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)
 
 
 if __name__ == "__main__":

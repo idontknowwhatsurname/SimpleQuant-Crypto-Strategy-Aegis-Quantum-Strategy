@@ -3,14 +3,12 @@
 AIQuant Engine - PyInstaller spec
 打包成独立的 macOS .app
 """
-import sys
-from pathlib import Path
 
 block_cipher = None
 
 a = Analysis(
-    ['gui/tui.py'],
-    pathex=[str(Path(__file__).parent)],
+    ['launcher.py'],
+    pathex=['.'],
     binaries=[],
     datas=[
         ('exchange', 'exchange'),
@@ -19,6 +17,8 @@ a = Analysis(
         ('evolution', 'evolution'),
         ('goal', 'goal'),
         ('mcp', 'mcp'),
+        ('gui/templates', 'gui/templates'),
+        ('gui/static', 'gui/static'),
         ('config.toml.example', '.'),
         ('README.md', '.'),
         ('README_CN.md', '.'),
@@ -35,14 +35,13 @@ a = Analysis(
         'evolution.manager',
         'goal.planner',
         'mcp.prompt_bar',
-        'textual', 'rich',
+        'flask',
+        'appdirs',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[
-        'tkinter', 'matplotlib', 'scipy', 'cv2', 'PIL',
-    ],
+    excludes=['tkinter', 'matplotlib', 'scipy', 'cv2', 'PIL'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -58,14 +57,14 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='AIQuantEngine',
+    name='AIQuant Engine',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

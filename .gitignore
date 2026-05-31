@@ -26,3 +26,8 @@ dashboard.html
 .idea/
 .DS_Store
 *.dmg
+
+# Build outputs
+build/
+dist/
+AIQuant Engine.spec

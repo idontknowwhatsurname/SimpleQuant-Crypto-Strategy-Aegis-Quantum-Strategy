@@ -3,24 +3,22 @@
 AIQuant Engine - Web GUI
 基于 Flask 的交易系统 GUI，参考 DeepSeek-Reasonix 的设计理念
 """
-import json
-import os
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+GUI_ROOT = Path(__file__).resolve().parent
 
 # 确保项目根目录在路径中
-sys.path.insert(0, str(Path(__file__).parent))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
-    from flask import Flask, render_template, jsonify, request
+    from flask import Flask, jsonify, render_template, request
 except ImportError:
     print("请先安装 Flask: pip install flask")
     sys.exit(1)
-
-app = Flask(__name__, 
-            template_folder=str(Path(__file__).parent / 'gui' / 'templates'),
-            static_folder=str(Path(__file__).parent / 'gui' / 'static'))
 
 # 全局状态
 engine_state = {
@@ -31,6 +29,18 @@ engine_state = {
     'last_signal': None,
     'last_regime': None,
 }
+
+
+def create_app() -> Flask:
+    """创建 Flask 应用，兼容源码运行与打包运行。"""
+    return Flask(
+        __name__,
+        template_folder=str(GUI_ROOT / "templates"),
+        static_folder=str(GUI_ROOT / "static"),
+    )
+
+
+app = create_app()
 
 @app.route('/')
 def index():
@@ -262,5 +272,5 @@ if __name__ == '__main__':
     print(f"  访问地址: http://localhost:5000")
     print(f"  按 Ctrl+C 停止")
     print("=" * 50)
-    
-    app.run(host='0.0.0.0', port=5000, debug=True)
+
+    app.run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)

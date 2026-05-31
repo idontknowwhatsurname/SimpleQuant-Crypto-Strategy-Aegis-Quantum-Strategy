@@ -31,7 +31,7 @@ class Sidebar(Vertical):
     """左侧导航栏"""
     
     def compose(self) -> ComposeResult:
-        yield Static("🛡️ AIQuant Engine", classes="sidebar-title")
+        yield Static("🦊 AIQuant", classes="sidebar-title")
         yield Static("")
         yield Button("仪表盘", id="btn-dashboard", variant="primary")
         yield Button("回测", id="btn-backtest")

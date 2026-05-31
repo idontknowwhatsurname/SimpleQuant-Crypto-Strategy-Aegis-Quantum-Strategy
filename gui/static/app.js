@@ -1,5 +1,5 @@
 /**
- * AIQuant Engine - GUI 交互逻辑
+ * AIQuant - GUI 交互逻辑
  */
 
 // Tab 切换

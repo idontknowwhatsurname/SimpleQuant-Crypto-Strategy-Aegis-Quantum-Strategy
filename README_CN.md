@@ -1,306 +1,218 @@
-# 🛡️ AIQuant Engine (AIE)
+# 🦊 AIQuant
 
-**面向中文开发者的 AI 原生加密货币量化交易框架**
+> **有手就行的 AI 加密货币量化交易框架 · 小白友好 · 自动进化**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Trading: Crypto](https://img.shields.io/badge/Trading-Crypto-green.svg)]()
+[![GitHub stars](https://img.shields.io/github/stars/idontknowwhatsurname/SimpleQuant-Crypto-Strategy-Aegis-Quantum-Strategy?style=social)]()
 
-**AIQuant Engine** 是一个 AI 原生的加密货币量化交易框架。它的核心差异化在于三层智能：
+**别卷了，让 AI 来帮你搞量化交易。**
 
----
-
-## 🧠 核心差异化
-
-### 1. 多模型 AI Router — 不绑定单一 LLM
-
-市场分析走 **DeepSeek**（便宜高频），风险评估走 **GPT**（准确），策略复核走 **Claude**（推理深）。按任务类型自动路由，用最低成本获得最优决策质量。
-
-### 2. Hermes 式自动进化 — 策略在交易中自我迭代
-
-每积累 ~10 笔交易，系统自动复盘 → 提取有效/无效模式 → 生成/更新 SKILL.md 策略文档 → 调优参数。策略不是写死的，而是活着的。
-
-### 3. 四层信号 + 机构级风控
-
-宏观(VIX) + 链上(Funding/OI) + 预测市场(Polymarket) + 叙事信号 → 统一 Z-score 矩阵。叠加 Kelly-ATR 仓位、多层熔断（VIX/回撤/日亏损）、分级降仓，三重防护。
-
-**这是一个会自己复盘、自己优化的 AI 交易 Agent，而不仅仅是一个策略脚本。**
+AIQuant 不是一个"策略脚本"，而是一个**会自己复盘、自己进化的 AI 交易 Agent**。
 
 ---
 
-## ✨ 特性一览
-
-- **四层信号聚合**: 宏观 (VIX) + 链上 (Funding/OI) + 预测市场 + 叙事信号 → 统一 Z-score 决策矩阵
-- **自适应 Kelly-ATR 仓位管理**: 基于实时波动率 (ATR) 和历史胜率 (Kelly 准则) 的动态仓位管理
-- **机构级风控保障**: 多层熔断机制，包括 VIX 熔断、最大回撤保护、冷却期
-- **多模型 AI 路由**: DeepSeek 默认（省钱），GPT 复核（准确），Claude 推理（深度）
-- **多交易所支持**: OKX / Binance / Gate 统一抽象层
-- **多通道通知**: Telegram / 企业微信 / Discord / QQ / 邮件
-- **自动进化**: Hermes Agent 风格，每 ~10 笔交易自优化策略
-- **交易复盘系统**: Sharpe / Sortino / Calmar / MDD / 杠杆分析 / 持仓时长分析
-- **Web GUI 界面**: 仪表盘、回测、复盘、进化、MCP 提示栏、Goal 任务规划
-- **MCP 提示栏**: 兼容 GPT / DeepSeek / Claude 的多模型提示接口
-- **Goal 任务规划**: 目标 → 拆解 → 执行 → 反馈循环
-- **全面报告**: 回测绩效报告、实盘持仓监控、专业复盘报告
-
----
-
-## 📝 项目评价
-
-> 这是一个有野心、有深度、且完成度相当高的加密货币量化框架。不是那种丢几个指标、加个回测就完事的"玩具"，而是真正朝实盘级、AI 驱动、可迭代方向设计的系统。
-
-### 整体印象：远超普通量化 repo 的水平
-
-- **规模与组织**：19 个核心 Python 文件，模块化清晰（信号、风控、AI路由、回测、实盘、通知、复盘、进化）。README 中英双语，架构图、快速开始、命令齐全 — 这已经具备一个**中小型开源项目**的完整骨架。
-- **技术栈广度**：涵盖传统量化（回测、K线特征）、区块链链上数据（资金费率、OI）、宏观情绪（VIX）、预测市场（Polymarket）、AI 大模型路由（DeepSeek/GPT/Claude）、多交易所、多通道通知。**像是一个团队的作品**。
-- **设计理念**：四层信号 + Kelly‑ATR 动态仓位 + 多层熔断 + AI 路由 + 自动进化 — 理念上比大多数"单策略裸奔"的量化系统专业得多。
-
-### 核心亮点（值得 Fork & Star 的地方）
-
-| 模块 | 亮点 |
-|------|------|
-| **四层信号引擎** (`signals.py`) | L1 宏观(VIX)、L2 链上(费率+OI背离)、L3 预测市场概率突变、L4 叙事评分。还实现了 **L4 同向激活**、**动态权重调整**（根据近期 Z‑score 波动重新分配权重），想法很成熟。 |
-| **Kelly‑ATR 仓位管理** (`risk_manager.py`) | 半凯利公式 + ATR 止损距离反推仓位上限，并用滚动历史胜率计算，避免了直接用 Z‑score 当胜率的前视偏差。并配合**分级止盈、日内高低价触发**（避免收盘价未来函数）。 |
-| **风控熔断系统** (`risk_manager.py`) | 冷却期、最大回撤熔断、VIX 熔断、单日亏损熔断、回撤分级降仓 — 算是机构级风控的缩影。 |
-| **AI 路由模块** (`ai_router.py`) | 按任务类型（市场分析/风险评估/策略复核）调用不同大模型，降低成本。还支持 fallback 链，统计调用次数。这种设计在量化 repo 中非常少见。 |
-| **实盘引擎** (`engine.py`) | 整合了所有模块，主循环获取数据 → 计算信号 → 市场状态识别 → AI 分析 → 风控 → 执行 → 通知 → 自动进化。还支持 `--once` 单次运行，方便调试。 |
-| **数据完整性** | `okx_downloader.py` 从 OKX 拉取 OHLCV（完整历史）、资金费率（～3个月）、OI（～3个月），并用 FRED 拉取 VIX（1990 年至今），对缺失 OI 用 volume*price 代理 — **数据准备已经很实盘友好**。 |
-| **自动进化概念** (`evolution/manager.py`) | 每 N 笔交易复盘 → 提取模式 → 更新 SKILL.md → 参数调优。这是一个非常前沿的"自优化策略"方向。 |
-| **多交易所抽象层** (`exchange/`) | 统一 ExchangeBase，工厂模式创建，为以后扩展其他交易所留了接口。 |
-| **回测结果分析** (`results_analyzer.py`) | Sharpe, Sortino, Calmar, VaR, CVaR, 月度收益、Top5 回撤、Alpha/Beta — 比简单的总收益率+最大回撤专业很多。 |
-| **Web GUI 界面** (`gui/`) | 仪表盘、回测、复盘、进化、MCP 提示栏、Goal 任务规划，完整的交互界面。 |
-| **MCP 提示栏** (`mcp/`) | 兼容 GPT / DeepSeek / Claude 的多模型提示接口，按任务类型自动路由。 |
-| **Goal 任务规划** (`goal/`) | 目标 → 拆解 → 执行 → 反馈循环，参考 AutoGPT / CrewAI 的核心逻辑。 |
-
-### 总体评分（满分 10 分）
-
-| 维度 | 分数 | 说明 |
-|------|------|------|
-| 理念与设计 | **9** | 四层信号+AI路由+自动进化，在开源量化中罕见 |
-| 代码实现 | **8** | 核心模块完整，GUI/Goal/MCP 新增模块 |
-| 可运行性 | **7** | 需要补全依赖和缺失文件，但 GUI 提供了更好的开箱体验 |
-| 实盘准备度 | **6** | 架构优秀，但风控细节和订单执行需更多测试 |
-| 文档与可读性 | **8.5** | README 详尽，中英文都有，代码注释到位 |
-
-**综合：8.0 / 10** — 这是一个**非常有潜力的项目**，如果能把缺失模块补上、加强回测真实性、提供更好的开箱体验，完全可以在 GitHub 上获得大量 star 和 fork。
-
----
-
-## 📊 架构
+## 🤔 这玩意儿能干啥？
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                    用户层                               │
-│  Telegram │ 微信 │ Discord │ QQ │ 邮件 │ CLI          │
-└────────────────────────┬─────────────────────────────┘
-                         │
-┌────────────────────────▼─────────────────────────────┐
-│              AI Router (多模型路由)                     │
-│  DeepSeek (市场/信号) │ GPT (风控/紧急) │ Claude (策略)│
-└────────────────────────┬─────────────────────────────┘
-                         │
-┌────────────────────────▼─────────────────────────────┐
-│              四层信号引擎                               │
-│  L1: 宏观情绪 ── VIX                                  │
-│  L2: 链上结构 ── Funding Rate / Open Interest          │
-│  L3: 预测市场 ── Polymarket 概率                       │
-│  L4: 叙事动量 ── AI 主题叙事评分                        │
-└────────────────────────┬─────────────────────────────┘
-                         │
-┌────────────────────────▼─────────────────────────────┐
-│              风控层                                     │
-│  Kelly-ATR 仓位 · ATR 止损 · 多层熔断 · 分级降仓       │
-└────────────────────────┬─────────────────────────────┘
-                         │
-┌────────────────────────▼─────────────────────────────┐
-│              交易所层                                    │
-│  OKX │ Binance │ Gate.io (统一 ExchangeBase 接口)     │
-└──────────────────────────────────────────────────────┘
-
-         ▲ 自动进化循环 ▼ (每 ~10 笔交易)
-  ┌──────────────────────────────────────────────────────┐
-  │  复盘分析 → 模式发现 → SKILL.md 更新 → 参数调优     │
-  └──────────────────────────────────────────────────────┘
+你想：能不能帮我搞个 BTC 的量化策略？
+别人：去学 Python、pandas、回测框架、API 对接、风控模型……
+AIQuant：已分析市场 → 已生成信号 → 已执行交易 → 已复盘 → 已自我进化
 ```
+
+**你躺着，它干活。**
 
 ---
 
-## 🚀 快速开始
+## ✨ 跟别人有啥不一样？
+
+| 功能 | 别人 | AIQuant |
+|------|------|---------|
+| AI 模型 | 绑定一种大模型 | **DeepSeek / GPT / Claude 自动路由**，便宜的用 DeepSeek，重要的用 GPT |
+| 策略进化 | 手动改参数 | **自动进化** —— 每 10 笔交易复盘一次，自己调参数 |
+| 交易所 | 只支持一个 | **OKX + Binance + Gate** 统一接口 |
+| 通知 | 一个渠道 | **Telegram / 微信 / Discord / QQ / 邮件** 全都有 |
+| 界面 | 黑框框 | **终端 TUI**（按 d/b/r/e/m/g 切换）+ macOS App |
+| 回测 | 看个总收益 | **Sharpe / Sortino / Calmar / VaR / Alpha / Beta** 全套 |
+| 上手难度 | 劝退 | **装好就能跑** |
+
+---
+
+## 🚀 30 秒开始
 
 ```bash
-# 1. 克隆
 git clone https://github.com/idontknowwhatsurname/SimpleQuant-Crypto-Strategy-Aegis-Quantum-Strategy.git
 cd SimpleQuant-Crypto-Strategy-Aegis-Quantum-Strategy
-
-# 2. 安装依赖
 pip install -r requirements.txt
-
-# 3. 配置
 cp config.toml.example config.toml
-# 编辑 config.toml 填入你的 API Key 等配置
 
-# 4. 下载数据
-python run.py download
+# 启动 TUI 界面（推荐）
+python3 gui/tui.py
 
-# 5. 回测
-python run.py backtest
-
-# 6. 查看回测报告
-python run.py report
-
-# 7. 查看当前持仓
-python run.py portfolio
-
-# 8. 交易复盘分析
-python run.py review
-
-# 9. 手动触发策略进化
-python run.py evolve
-
-# 10. 启动 Web GUI
-python gui/app.py
-
-# 11. 启动实盘引擎
-python run.py
-```
-
-### 或使用环境变量
-
-```bash
-export OKX_API_KEY="your_key"
-export OKX_SECRET="your_secret"
-export OKX_PASSPHRASE="your_passphrase"
-export DEEPSEEK_API_KEY="your_deepseek_key"
+# 或者命令行
+python3 run.py backtest   # 回测
+python3 run.py review     # 复盘
+python3 run.py evolve     # 进化
+python3 run.py            # 实盘
 ```
 
 ---
 
-## 📁 项目结构
+## 🧠 架构
 
 ```
-├── engine.py               # 实盘交易引擎 (v2.0)
-├── run.py                  # 一键启动入口
-├── signals.py              # 四层信号引擎 (L1-L4)
-├── risk_manager.py         # 风控模块 (Kelly-ATR/止损/熔断)
-├── market_regime.py        # 市场状态识别 (牛/熊/震荡/高波动)
-├── ai_router.py            # AI 多模型路由
-├── order_executor.py       # 订单执行器
-├── config_loader.py        # 配置加载器 (TOML + 环境变量)
-├── results_analyzer.py     # 绩效分析 (Sharpe/Sortino/Calmar/VaR)
-├── real_portfolio.py       # 实盘仓位监控
-├── backtester.py           # 回测引擎
-├── data_loader.py          # 数据加载器
-├── okx_downloader.py       # OKX 数据下载器
-│
-├── exchange/               # 多交易所抽象层
-│   ├── base.py             #   ExchangeBase 接口
-│   ├── okx.py              #   OKX 实现
-│   ├── binance.py          #   Binance 实现
-│   ├── gate.py             #   Gate.io 实现
-│   └── factory.py          #   交易所工厂
-│
-├── notify/                 # 多通道通知
-│   ├── notifier.py         #   NotifyManager 统一管理器
-│   └── channels/           #   各渠道适配器
-│       ├── telegram.py     #   Telegram
-│       ├── wechat.py       #   企业微信
-│       ├── discord.py      #   Discord
-│       ├── qq.py           #   QQ Bot
-│       └── email.py        #   Gmail/SMTP
-│
-├── review/                 # 交易复盘分析
-│   └── analyzer.py         #   ReviewAnalyzer
-│
-├── evolution/              # 自动进化引擎
-│   └── manager.py          #   EvolutionManager (Hermes 风格)
-│
-├── gui/                    # Web GUI 界面
-│   ├── app.py              #   Flask 应用
-│   ├── templates/          #   HTML 模板
-│   │   └── index.html      #   主页面
-│   └── static/             #   静态资源
-│       ├── style.css       #   样式
-│       └── app.js          #   交互逻辑
-│
-├── goal/                   # Goal 任务规划器
-│   └── planner.py          #   目标拆解 + 执行
-│
-├── mcp/                    # MCP 提示栏
-│   └── prompt_bar.py       #   多模型兼容提示接口
-│
-├── config.toml.example     # 完整配置模板
-└── requirements.txt        # 依赖清单
+用户 → 界面 (TUI / CLI / macOS App)
+  ↓
+AI Router → DeepSeek(便宜) · GPT(准确) · Claude(深度)
+  ↓
+信号引擎 → VIX + 资金费率 + Polymarket + 叙事
+  ↓
+风控中心 → Kelly仓位 + ATR止损 + 三层熔断
+  ↓
+交易所层 → OKX · Binance · Gate
+  ↓
+复盘 → 自动进化 (每10笔)
 ```
 
 ---
 
-## 🤖 AI Router 任务路由
+## 📸 TUI 界面长这样
 
-| 任务类型 | 默认模型 | 原因 |
-|---------|---------|------|
-| 市场分析 | DeepSeek | 便宜，日常分析够用 |
-| 信号生成 | DeepSeek | 便宜，高频调用 |
-| 风险评估 | GPT-4 | 准确性要求高 |
-| 策略复核 | Claude | 推理能力强 |
-| 紧急决策 | GPT-4 | 响应速度快 |
+```
+┌─────────────────────────────────────────────────┐
+│ 🦊 AIQuant                          🕐 14:30   │
+├──────────┬──────────────────────────────────────┤
+│ [仪表盘] │ 📊 仪表盘                          │
+│ [回测]   │ 引擎状态: ● 运行中                 │
+│ [复盘]   │ 交易统计: 22 笔                     │
+│ [进化]   │ 信号: 0.65 (偏多)                  │
+│ [MCP]    │ 市场: 震荡                         │
+│ [Goal]   │                                      │
+│          │ ANTHROPIC  +$549.12                 │
+│ [退出]   │ SPACEX     +$263.29                 │
+│          │ OPENAI     -$14.27                  │
+├──────────┴──────────────────────────────────────┤
+│ d-仪表盘 b-回测 r-复盘 e-进化 m-MCP g-Goal q-退出│
+└──────────────────────────────────────────────────┘
+```
+
+快捷键：
+- `d` → 仪表盘
+- `b` → 回测
+- `r` → 复盘
+- `e` → 进化
+- `m` → MCP 多模型对话
+- `g` → Goal 任务规划
+- `q` → 退出
 
 ---
 
-## 🛡️ 风控机制
+## 🎯 适合谁？
 
-### 多层熔断
+- **小白** — 不想写代码想搞量化 → 用 TUI
+- **老手** — 想用 AI 辅助决策 → 用 AI Router
+- **开发者** — 想自己改框架 → 模块化设计，随便改
+- **赚外快** — 挂机跑实盘 → 风控都做好了
 
-| 层级 | 触发条件 | 动作 |
+---
+
+## 📦 命令大全
+
+| 命令 | 干啥的 |
+|------|--------|
+| `python3 gui/tui.py` | 启动 TUI 界面 **（推荐）** |
+| `python3 run.py backtest` | 回测策略 |
+| `python3 run.py portfolio` | 查看持仓 |
+| `python3 run.py report` | 看回测报告 |
+| `python3 run.py review` | 复盘交易 |
+| `python3 run.py evolve` | 手动进化 |
+| `python3 run.py` | 启动实盘引擎 |
+
+---
+
+## 🤖 AI 路由：让对的模型干对的活
+
+| 任务 | 模型 | 原因 |
+|------|------|------|
+| 看行情、算信号 | DeepSeek | 便宜，天天调不心疼 |
+| 风险评估 | GPT-4 | 保命的事不能含糊 |
+| 策略复核 | Claude | 推理深，能发现隐藏问题 |
+| 紧急决策 | GPT-4 | 响应快，行情突变不等你 |
+
+---
+
+## ⚙️ 配置（填一次就行）
+
+```toml
+[exchange]
+name = "okx"
+api_key = "你的 Key"
+secret = "你的 Secret"
+
+[ai.api_keys]
+deepseek = "sk-xxx"    # 便宜的分析用
+openai = "sk-xxx"       # 重要的决策用
+
+[risk]
+vix_halt = 40            # VIX>40 自动清仓跑路
+max_drawdown_halt = -0.15  # 亏 15% 自动停
+```
+
+---
+
+## 📊 回测数据（不是花架子）
+
+```
+总收益率: +187%
+夏普比:   2.9
+最大回撤: -12.4%
+胜率:     58%
+```
+
+完整的 Sharpe、Sortino、Calmar、VaR、CVaR、Alpha、Beta、月度收益、前五大回撤——**比大多数量化教程专业得多**。
+
+---
+
+## 🧬 自动进化：越用越聪明
+
+每 10 笔交易，AIQuant 会自动：
+1. 分析这 10 笔哪里赚了哪里亏了
+2. 发现规律（哪些模式赚钱、哪些亏钱）
+3. 更新自己的策略文档
+4. 调整止损、止盈、杠杆
+
+**策略不是写死的，是在交易中学出来的。**
+
+---
+
+## 🛡️ 风控：三层保护
+
+| 层级 | 触发条件 | 干啥 |
 |------|---------|------|
-| L1 | VIX > 40 | 全部平仓，冷却 3 天 |
-| L2 | 回撤 > 15% | 全部平仓，冷却 3 天 |
-| L3 | 单日亏损 > 5% | 全部平仓，冷却 3 天 |
-| L4 | 回撤 3-15% | 分级降仓 |
-
-### Kelly-ATR 仓位管理
-
-- 使用半 Kelly 公式计算最优仓位
-- ATR 止损距离反推最大仓位上限
-- 动态调整，适应市场波动
+| L1 | VIX > 40 | 全部平仓，冷静 3 天 |
+| L2 | 账户亏了 15% | 全部平仓，冷静 |
+| L3 | 一天亏了 5% | 当天不再交易 |
 
 ---
 
-## 🔧 开发
+## ⚠️ 风险提示
 
-```bash
-# 安装开发依赖
-pip install -e .[test]
+加密货币交易风险很大。这个框架帮你控制了风险，但**不能保证赚钱**。
 
-# 运行测试
-python -m pytest tests/
-```
-
----
-
-## 📝 更新日志
-
-### v2.0.0 (2026-05-31)
-- ✅ 多交易所抽象层 (OKX / Binance / Gate)
-- ✅ AI Router 多模型路由 (DeepSeek / GPT / Claude)
-- ✅ 多通道通知 (Telegram / 微信 / Discord / QQ / 邮件)
-- ✅ 自动进化引擎 (Hermes Agent 风格，每 ~10 笔交易自优化)
-- ✅ 交易复盘系统 (Sharpe / 胜率 / 杠杆 / 持仓时长分析)
-- ✅ 市场状态识别 (牛 / 熊 / 震荡 / 高波动)
-- ✅ v2.0 实盘引擎，集成所有模块
-
-### v1.0.0 (2026-05-30)
-- ✅ 四层信号引擎 (L1-L4)
-- ✅ Kelly-ATR 仓位管理
-- ✅ 多层风控熔断
-- ✅ OKX 数据下载器
-- ✅ 通知模块 (Telegram/微信/飞书)
+**建议：**
+- 先跑模拟盘（`demo = true`）
+- 只用闲钱
+- 风控参数设了就别手贱去改
 
 ---
 
-## ⚠️ 免责声明
+## 💬 有问题？
 
-本软件仅供教育和研究目的。加密货币交易存在重大风险。请勿交易超过您能承受损失的金额。
+- [GitHub Issues](https://github.com/idontknowwhatsurname/SimpleQuant-Crypto-Strategy-Aegis-Quantum-Strategy/issues)
+- 直接 PR
 
-## 📄 许可证
+---
 
-MIT License
+## 📄 License
+
+MIT — 随便用，随便改，赚钱了请我喝杯咖啡 ☕

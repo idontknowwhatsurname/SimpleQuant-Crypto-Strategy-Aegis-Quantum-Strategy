@@ -27,7 +27,7 @@ class EmailChannel:
             msg = MIMEMultipart()
             msg['From'] = self.from_addr
             msg['To'] = self.to_addrs
-            msg['Subject'] = 'Aegis Quantum Strategy - 通知'
+            msg['Subject'] = 'AIQuant Engine - 通知'
             msg.attach(MIMEText(message, 'plain', 'utf-8'))
             server = smtplib.SMTP(self.smtp_host, self.smtp_port)
             if self.use_tls:

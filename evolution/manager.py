@@ -188,7 +188,7 @@ class EvolutionManager:
         analysis = analysis or analyzer.analyze_trades()
 
         lines = [
-            '# Aegis Quantum Strategy - 交易技能',
+            '# AIQuant Engine - 交易技能',
             '',
             '## 技能概述',
             f'自动进化版交易策略 (第 {self.evolution_count + 1} 代)',

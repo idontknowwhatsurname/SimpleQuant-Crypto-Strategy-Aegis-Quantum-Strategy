@@ -1,5 +1,5 @@
 """
-Aegis Quantum Strategy - 实盘交易引擎 (v2.0)
+AIQuant Engine - 实盘交易引擎 (v2.0)
 集成多交易所、AI路由、复盘分析、自动进化、多通道通知
 """
 import time
@@ -266,7 +266,7 @@ class TradingEngine:
         """主循环"""
         self.running = True
         print("=" * 50)
-        print("🚀 Aegis Quantum Strategy - 实盘引擎启动")
+        print("🚀 AIQuant Engine - 实盘引擎启动")
         print(f"  轮询间隔: {self.interval} 秒")
         print(f"  运行模式: {'实盘' if not self.config.get('exchange', {}).get('demo') else '模拟'}")
         print("=" * 50)

@@ -1,12 +1,12 @@
-# 🛡️ Aegis Quantum Strategy (AQS)
+# 🛡️ AIQuant Engine (AIE)
 
-**An AI-native crypto quant trading framework for Chinese-speaking developers**
+**AI-native crypto quant trading agent that evolves itself**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Trading: Crypto](https://img.shields.io/badge/Trading-Crypto-green.svg)]()
 
-**Aegis Quantum Strategy** is an AI-native crypto quantitative trading framework. Its core differentiation is three-layer intelligence:
+**AIQuant Engine** is an AI-native crypto quantitative trading agent. Its core differentiation is three-layer intelligence:
 
 ---
 

@@ -1,4 +1,4 @@
-# Aegis Quantum Strategy - 依赖清单
+# AIQuant Engine - 依赖清单
 # 安装: pip install -r requirements.txt
 
 # 核心依赖

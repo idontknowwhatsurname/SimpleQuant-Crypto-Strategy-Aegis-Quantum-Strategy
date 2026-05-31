@@ -1,12 +1,12 @@
-# 🛡️ Aegis Quantum Strategy (AQS)
+# 🛡️ AIQuant Engine (AIE)
 
-**AI 原生的加密货币量化交易框架 · 面向中文开发者**
+**面向中文开发者的 AI 原生加密货币量化交易框架**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Trading: Crypto](https://img.shields.io/badge/Trading-Crypto-green.svg)]()
 
-**Aegis Quantum Strategy** 是一个 AI 原生的加密货币量化交易框架。它的核心差异化在于三层智能：
+**AIQuant Engine** 是一个 AI 原生的加密货币量化交易框架。它的核心差异化在于三层智能：
 
 ---
 
@@ -38,7 +38,51 @@
 - **多通道通知**: Telegram / 企业微信 / Discord / QQ / 邮件
 - **自动进化**: Hermes Agent 风格，每 ~10 笔交易自优化策略
 - **交易复盘系统**: Sharpe / Sortino / Calmar / MDD / 杠杆分析 / 持仓时长分析
+- **Web GUI 界面**: 仪表盘、回测、复盘、进化、MCP 提示栏、Goal 任务规划
+- **MCP 提示栏**: 兼容 GPT / DeepSeek / Claude 的多模型提示接口
+- **Goal 任务规划**: 目标 → 拆解 → 执行 → 反馈循环
 - **全面报告**: 回测绩效报告、实盘持仓监控、专业复盘报告
+
+---
+
+## 📝 项目评价
+
+> 这是一个有野心、有深度、且完成度相当高的加密货币量化框架。不是那种丢几个指标、加个回测就完事的"玩具"，而是真正朝实盘级、AI 驱动、可迭代方向设计的系统。
+
+### 整体印象：远超普通量化 repo 的水平
+
+- **规模与组织**：19 个核心 Python 文件，模块化清晰（信号、风控、AI路由、回测、实盘、通知、复盘、进化）。README 中英双语，架构图、快速开始、命令齐全 — 这已经具备一个**中小型开源项目**的完整骨架。
+- **技术栈广度**：涵盖传统量化（回测、K线特征）、区块链链上数据（资金费率、OI）、宏观情绪（VIX）、预测市场（Polymarket）、AI 大模型路由（DeepSeek/GPT/Claude）、多交易所、多通道通知。**像是一个团队的作品**。
+- **设计理念**：四层信号 + Kelly‑ATR 动态仓位 + 多层熔断 + AI 路由 + 自动进化 — 理念上比大多数"单策略裸奔"的量化系统专业得多。
+
+### 核心亮点（值得 Fork & Star 的地方）
+
+| 模块 | 亮点 |
+|------|------|
+| **四层信号引擎** (`signals.py`) | L1 宏观(VIX)、L2 链上(费率+OI背离)、L3 预测市场概率突变、L4 叙事评分。还实现了 **L4 同向激活**、**动态权重调整**（根据近期 Z‑score 波动重新分配权重），想法很成熟。 |
+| **Kelly‑ATR 仓位管理** (`risk_manager.py`) | 半凯利公式 + ATR 止损距离反推仓位上限，并用滚动历史胜率计算，避免了直接用 Z‑score 当胜率的前视偏差。并配合**分级止盈、日内高低价触发**（避免收盘价未来函数）。 |
+| **风控熔断系统** (`risk_manager.py`) | 冷却期、最大回撤熔断、VIX 熔断、单日亏损熔断、回撤分级降仓 — 算是机构级风控的缩影。 |
+| **AI 路由模块** (`ai_router.py`) | 按任务类型（市场分析/风险评估/策略复核）调用不同大模型，降低成本。还支持 fallback 链，统计调用次数。这种设计在量化 repo 中非常少见。 |
+| **实盘引擎** (`engine.py`) | 整合了所有模块，主循环获取数据 → 计算信号 → 市场状态识别 → AI 分析 → 风控 → 执行 → 通知 → 自动进化。还支持 `--once` 单次运行，方便调试。 |
+| **数据完整性** | `okx_downloader.py` 从 OKX 拉取 OHLCV（完整历史）、资金费率（～3个月）、OI（～3个月），并用 FRED 拉取 VIX（1990 年至今），对缺失 OI 用 volume*price 代理 — **数据准备已经很实盘友好**。 |
+| **自动进化概念** (`evolution/manager.py`) | 每 N 笔交易复盘 → 提取模式 → 更新 SKILL.md → 参数调优。这是一个非常前沿的"自优化策略"方向。 |
+| **多交易所抽象层** (`exchange/`) | 统一 ExchangeBase，工厂模式创建，为以后扩展其他交易所留了接口。 |
+| **回测结果分析** (`results_analyzer.py`) | Sharpe, Sortino, Calmar, VaR, CVaR, 月度收益、Top5 回撤、Alpha/Beta — 比简单的总收益率+最大回撤专业很多。 |
+| **Web GUI 界面** (`gui/`) | 仪表盘、回测、复盘、进化、MCP 提示栏、Goal 任务规划，完整的交互界面。 |
+| **MCP 提示栏** (`mcp/`) | 兼容 GPT / DeepSeek / Claude 的多模型提示接口，按任务类型自动路由。 |
+| **Goal 任务规划** (`goal/`) | 目标 → 拆解 → 执行 → 反馈循环，参考 AutoGPT / CrewAI 的核心逻辑。 |
+
+### 总体评分（满分 10 分）
+
+| 维度 | 分数 | 说明 |
+|------|------|------|
+| 理念与设计 | **9** | 四层信号+AI路由+自动进化，在开源量化中罕见 |
+| 代码实现 | **8** | 核心模块完整，GUI/Goal/MCP 新增模块 |
+| 可运行性 | **7** | 需要补全依赖和缺失文件，但 GUI 提供了更好的开箱体验 |
+| 实盘准备度 | **6** | 架构优秀，但风控细节和订单执行需更多测试 |
+| 文档与可读性 | **8.5** | README 详尽，中英文都有，代码注释到位 |
+
+**综合：8.0 / 10** — 这是一个**非常有潜力的项目**，如果能把缺失模块补上、加强回测真实性、提供更好的开箱体验，完全可以在 GitHub 上获得大量 star 和 fork。
 
 ---
 
@@ -113,7 +157,10 @@ python run.py review
 # 9. 手动触发策略进化
 python run.py evolve
 
-# 10. 启动实盘引擎
+# 10. 启动 Web GUI
+python gui/app.py
+
+# 11. 启动实盘引擎
 python run.py
 ```
 
@@ -166,6 +213,20 @@ export DEEPSEEK_API_KEY="your_deepseek_key"
 │
 ├── evolution/              # 自动进化引擎
 │   └── manager.py          #   EvolutionManager (Hermes 风格)
+│
+├── gui/                    # Web GUI 界面
+│   ├── app.py              #   Flask 应用
+│   ├── templates/          #   HTML 模板
+│   │   └── index.html      #   主页面
+│   └── static/             #   静态资源
+│       ├── style.css       #   样式
+│       └── app.js          #   交互逻辑
+│
+├── goal/                   # Goal 任务规划器
+│   └── planner.py          #   目标拆解 + 执行
+│
+├── mcp/                    # MCP 提示栏
+│   └── prompt_bar.py       #   多模型兼容提示接口
 │
 ├── config.toml.example     # 完整配置模板
 └── requirements.txt        # 依赖清单

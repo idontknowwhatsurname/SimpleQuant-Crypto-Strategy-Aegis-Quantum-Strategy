@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Aegis Quantum Strategy - 一键启动入口
+AIQuant Engine - 一键启动入口
 =======================================
 用法:
     python run.py              # 启动实盘引擎
@@ -151,7 +151,7 @@ def cmd_evolve():
 
 def cmd_help():
     print("""
-Aegis Quantum Strategy - 帮助
+AIQuant Engine - 帮助
 ==============================
 
 用法: python run.py <命令>

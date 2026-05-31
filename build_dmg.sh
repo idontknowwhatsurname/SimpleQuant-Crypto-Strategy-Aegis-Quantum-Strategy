@@ -1,139 +1,179 @@
 #!/bin/bash
 # AIQuant Engine - macOS DMG 构建脚本
-# 用法: ./build_dmg.sh
-
+# 使用 PyInstaller 打包为独立 .app
+# 
+# 前置条件:
+#   pip install textual rich pyinstaller
+#
 set -e
 
 APP_NAME="AIQuant Engine"
 APP_VERSION="2.0.0"
 BUILD_DIR="build"
-APP_DIR="$BUILD_DIR/$APP_NAME.app"
-DMG_NAME="AIQuant-Engine-$APP_VERSION.dmg"
+DMG_NAME="AIQuant-Engine-${APP_VERSION}.dmg"
+SPEC_FILE="aiquant.spec"
 
 echo "=========================================="
 echo "🚀 AIQuant Engine - DMG 构建脚本"
 echo "=========================================="
+echo ""
 
-# 清理旧的构建
-rm -rf "$BUILD_DIR"
-mkdir -p "$APP_DIR/Contents/MacOS"
-mkdir -p "$APP_DIR/Contents/Resources"
+# 检查工具链
+echo "🔍 检查环境..."
 
-# 创建 Info.plist
-cat > "$APP_DIR/Contents/Info.plist" << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>aiquant-engine</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.aiquant.engine</string>
-    <key>CFBundleName</key>
-    <string>$APP_NAME</string>
-    <key>CFBundleDisplayName</key>
-    <string>$APP_NAME</string>
-    <key>CFBundleVersion</key>
-    <string>$APP_VERSION</string>
-    <key>CFBundleShortVersionString</key>
-    <string>$APP_VERSION</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleSignature</key>
-    <string>????</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>10.15</string>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2026 AIQuant Engine. All rights reserved.</string>
-</dict>
-</plist>
-EOF
-
-# 创建启动脚本
-cat > "$APP_DIR/Contents/MacOS/aiquant-engine" << 'EOF'
-#!/bin/bash
-# AIQuant Engine 启动脚本
-
-# 获取脚本所在目录
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-APP_DIR="$( dirname "$( dirname "$SCRIPT_DIR" )" )"
-
-# 检查 Python
+# Python
 if ! command -v python3 &> /dev/null; then
-    osascript -e 'display dialog "请先安装 Python 3.10+\n\nbrew install python@3.11" buttons {"确定"} default button 1 with icon stop with title "AIQuant Engine"'
+    echo "❌ 需要 Python 3.10+"
+    echo "   安装: brew install python@3.11"
     exit 1
 fi
+PY_VER=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+echo "  ✅ Python $PY_VER"
 
-# 检查依赖
-PYTHON_DIR="$APP_DIR/Contents/Resources/python"
-if [ ! -d "$PYTHON_DIR" ]; then
-    osascript -e 'display dialog "首次运行需要安装依赖\n\n请运行: pip install -r requirements.txt" buttons {"确定"} default button 1 with icon note with title "AIQuant Engine"'
+# PyInstaller
+if ! python3 -c "import PyInstaller" 2>/dev/null; then
+    echo "  ⏳ 安装 PyInstaller..."
+    pip3 install pyinstaller
 fi
+echo "  ✅ PyInstaller"
 
-# 启动 Web GUI
-cd "$APP_DIR/Contents/Resources"
-open -a "Python Launcher" gui/app.py 2>/dev/null || python3 gui/app.py &
+# Textual
+if ! python3 -c "import textual" 2>/dev/null; then
+    echo "  ⏳ 安装 Textual..."
+    pip3 install textual rich
+fi
+echo "  ✅ Textual"
 
-# 等待服务器启动
-sleep 2
+echo ""
 
-# 打开浏览器
-open "http://localhost:5000"
-EOF
+# 清理旧构建
+echo "🧹 清理..."
+rm -rf "$BUILD_DIR" "$DMG_NAME" dist
 
-chmod +x "$APP_DIR/Contents/MacOS/aiquant-engine"
+# 构建 .app
+echo "📦 使用 PyInstaller 构建 .app..."
+python3 -m PyInstaller \
+    --name "AIQuant Engine" \
+    --onefile \
+    --windowed \
+    --add-data "exchange:exchange" \
+    --add-data "notify:notify" \
+    --add-data "review:review" \
+    --add-data "evolution:evolution" \
+    --add-data "goal:goal" \
+    --add-data "mcp:mcp" \
+    --add-data "config.toml.example:." \
+    --add-data "README.md:." \
+    --add-data "README_CN.md:." \
+    --hidden-import "signals" \
+    --hidden-import "risk_manager" \
+    --hidden-import "market_regime" \
+    --hidden-import "ai_router" \
+    --hidden-import "order_executor" \
+    --hidden-import "config_loader" \
+    --hidden-import "results_analyzer" \
+    --hidden-import "real_portfolio" \
+    --hidden-import "backtester" \
+    --hidden-import "data_loader" \
+    --hidden-import "exchange.base" \
+    --hidden-import "exchange.okx" \
+    --hidden-import "exchange.binance" \
+    --hidden-import "exchange.gate" \
+    --hidden-import "exchange.factory" \
+    --hidden-import "notify.channels.telegram" \
+    --hidden-import "notify.channels.wechat" \
+    --hidden-import "notify.channels.discord" \
+    --hidden-import "notify.channels.qq" \
+    --hidden-import "notify.channels.email" \
+    --hidden-import "review.analyzer" \
+    --hidden-import "evolution.manager" \
+    --hidden-import "goal.planner" \
+    --hidden-import "mcp.prompt_bar" \
+    --hidden-import "textual" \
+    --hidden-import "rich" \
+    --collect-all "textual" \
+    --collect-all "rich" \
+    --collect-all "exchange" \
+    --collect-all "notify" \
+    --collect-all "review" \
+    --collect-all "evolution" \
+    --collect-all "goal" \
+    --collect-all "mcp" \
+    --exclude "tkinter" \
+    --exclude "matplotlib" \
+    --exclude "scipy" \
+    --exclude "cv2" \
+    gui/tui.py
 
-# 复制项目文件
-echo "📦 复制项目文件..."
-cp -r gui "$APP_DIR/Contents/Resources/"
-cp -r goal "$APP_DIR/Contents/Resources/"
-cp -r mcp "$APP_DIR/Contents/Resources/"
-cp -r exchange "$APP_DIR/Contents/Resources/"
-cp -r notify "$APP_DIR/Contents/Resources/"
-cp -r review "$APP_DIR/Contents/Resources/"
-cp -r evolution "$APP_DIR/Contents/Resources/"
-cp *.py "$APP_DIR/Contents/Resources/"
-cp requirements.txt "$APP_DIR/Contents/Resources/"
-cp config.toml.example "$APP_DIR/Contents/Resources/"
-cp README.md "$APP_DIR/Contents/Resources/"
-cp README_CN.md "$APP_DIR/Contents/Resources/"
+# 检查构建结果
+if [ ! -d "dist/AIQuant Engine.app" ]; then
+    echo "❌ .app 构建失败"
+    exit 1
+fi
+echo "  ✅ .app 构建成功"
+
+# 设置图标（如果有）
+echo "  🎨 配置应用..."
+plist="dist/AIQuant Engine.app/Contents/Info.plist"
+# 更新 plist
+python3 -c "
+import plistlib
+plist_path = '$plist'
+with open(plist_path, 'rb') as f:
+    pl = plistlib.load(f)
+pl['CFBundleShortVersionString'] = '$APP_VERSION'
+pl['CFBundleVersion'] = '$APP_VERSION'
+pl['CFBundleIdentifier'] = 'com.aiquant.engine'
+pl['CFBundleDisplayName'] = '$APP_NAME'
+pl['NSHighResolutionCapable'] = True
+pl['LSMinimumSystemVersion'] = '10.15'
+with open(plist_path, 'wb') as f:
+    plistlib.dump(pl, f)
+print('  ✅ Info.plist 已更新')
+"
+
+# 签名（本地开发不需要正式签名）
+echo "  🔏 签名应用..."
+codesign --force --deep --sign - "dist/AIQuant Engine.app" 2>/dev/null && echo "  ✅ 签名完成" || echo "  ⚠️ 签名跳过"
 
 # 创建 DMG
 echo "💿 创建 DMG..."
-if command -v hdiutil &> /dev/null; then
-    # 使用 hdiutil 创建 DMG
-    hdiutil create -volname "$APP_NAME" \
-        -srcfolder "$APP_DIR" \
-        -ov -format UDZO \
-        "$DMG_NAME"
-    
-    echo "✅ DMG 创建成功: $DMG_NAME"
-else
-    echo "⚠️ hdiutil 不可用，创建 ZIP 替代..."
-    cd "$BUILD_DIR"
-    zip -r "../$APP_NAME-$APP_VERSION.zip" "$APP_NAME.app"
-    cd ..
-    echo "✅ ZIP 创建成功: $APP_NAME-$APP_VERSION.zip"
-fi
+mkdir -p "$BUILD_DIR"
+
+# 创建一个临时目录用于 DMG 内容
+TEMP_DMG="$BUILD_DIR/dmg"
+mkdir -p "$TEMP_DMG"
+
+# 复制 .app 到 DMG 目录
+cp -R "dist/AIQuant Engine.app" "$TEMP_DMG/"
+
+# 创建 Applications 别名（拖拽安装提示）
+ln -s /Applications "$TEMP_DMG/Applications"
+
+# 创建 DMG
+hdiutil create \
+    -volname "$APP_NAME" \
+    -srcfolder "$TEMP_DMG" \
+    -ov -format UDZO \
+    -size 500m \
+    "$DMG_NAME"
 
 # 清理
-rm -rf "$BUILD_DIR"
+rm -rf "$BUILD_DIR/TEMP_DMG" 2>/dev/null
 
 echo ""
 echo "=========================================="
 echo "✅ 构建完成！"
 echo "=========================================="
 echo ""
-echo "文件位置:"
-if [ -f "$DMG_NAME" ]; then
-    echo "  DMG: $DMG_NAME"
-else
-    echo "  ZIP: $APP_NAME-$APP_VERSION.zip"
-fi
+echo "📦 DMG 文件: $DMG_NAME"
+echo "📏 大小: $(du -h "$DMG_NAME" | cut -f1)"
 echo ""
-echo "分发方式:"
-echo "  1. 上传到 GitHub Releases"
-echo "  2. 上传到网盘分享给客户"
-echo "  3. 直接发送文件"
+echo "安装方式:"
+echo "  1. 双击 $DMG_NAME"
+echo "  2. 拖动 AIQuant Engine.app 到 Applications 文件夹"
+echo "  3. 在终端运行: open -a 'AIQuant Engine'"
+echo ""
+echo "注意: 首次运行会提示\"无法验证开发者\""
+echo "      右键 → 打开 即可运行"
+echo "=========================================="

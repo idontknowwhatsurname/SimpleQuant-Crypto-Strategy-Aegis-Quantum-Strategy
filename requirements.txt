@@ -20,3 +20,10 @@ matplotlib>=3.7
 
 # 配置管理
 tomli>=2.0; python_version < "3.11"
+
+# Textual TUI (Reasonix 风格界面)
+textual>=0.41.0
+rich>=13.0.0
+
+# macOS 打包（仅构建用）
+# pyinstaller>=6.0.0

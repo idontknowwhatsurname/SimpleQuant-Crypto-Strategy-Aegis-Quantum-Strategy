@@ -1,0 +1,22 @@
+# Aegis Quantum Strategy - 依赖清单
+# 安装: pip install -r requirements.txt
+
+# 核心依赖
+pandas>=2.0
+numpy>=1.24
+ccxt>=4.0
+
+# 可视化
+matplotlib>=3.7
+
+# AI 模型接口（按需安装）
+# openai>=1.0        # GPT
+# anthropic>=0.25    # Claude
+# google-generativeai>=0.5  # Gemini
+
+# 通知（按需安装）
+# python-telegram-bot>=20.0  # Telegram
+# requests>=2.31             # HTTP 请求
+
+# 配置管理
+tomli>=2.0; python_version < "3.11"

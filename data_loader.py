@@ -50,43 +50,49 @@ class DataLoader:
             vix[d] += np.random.uniform(10, 20)
         vix = np.clip(vix, 10, 80)
 
-        # --- Funding Rate & OI: Inject Perfect Predictive Alpha ---
-        # Instead of random noise, we make FR and OI perfectly predict the NEXT 5 days return
+        # --- Funding Rate & OI: 基于历史模式的模拟 ---
+        # 注意：原版使用未来收益注入"完美预测 Alpha"，存在前视偏差
+        # 修正版：使用滞后相关性 + 随机扰动，更接近真实市场
         fr = np.random.normal(0.0001, 0.0003, n)
         oi = np.zeros(n); oi[0] = 5e9
         
-        # Calculate forward 1-day returns to create the alpha
-        fwd_returns = pd.Series(price).pct_change(1).shift(-1).fillna(0).values
+        # 计算历史收益（不使用未来数据）
+        hist_returns = pd.Series(price).pct_change(1).fillna(0).values
         
         for i in range(1, n):
-            # Normal drift for OI
+            # OI 正常漂移
             drift = 0.001 if i < p1 else (-0.003 if i < p2 else 0.0005)
             oi[i] = oi[i-1] * (1 + drift + np.random.normal(0, 0.01))
             
-            # If market is about to crash > 3% tomorrow (Strong Short Signal needed)
-            if fwd_returns[i] < -0.03:
-                fr[i] = fr[i-1] + 0.005  # Spike FR up (z_fr > 2.0)
-                oi[i] = oi[i-1] * 1.10   # Spike OI up (z_oi > 1.5)
-                
-            # If market is about to rally > 3% tomorrow (Strong Long Signal needed)
-            elif fwd_returns[i] > 0.03:
-                fr[i] = fr[i-1] - 0.005  # Spike FR down (z_fr < -2.0)
-                oi[i] = oi[i-1] * 1.10   # Spike OI up (z_oi > 1.5)
-                
+            # Funding Rate 与过去 3 天收益弱相关（滞后关系，无前视偏差）
+            if i >= 3:
+                past_3d_return = (price[i-1] - price[i-4]) / price[i-4]
+                # 过去涨 → FR 被推高（多头拥挤）
+                fr[i] = fr[i-1] + past_3d_return * 0.001 + np.random.normal(0, 0.0002)
+                # OI 与 FR 同向
+                if abs(past_3d_return) > 0.03:
+                    oi[i] = oi[i-1] * (1 + np.random.uniform(0.02, 0.08))
+            else:
+                fr[i] = fr[i-1] + np.random.normal(0, 0.0002)
+        
         fr = np.clip(fr, -0.01, 0.01)
         oi = np.maximum(oi, 1e9)
 
-        # --- Polymarket概率 + 突变事件 ---
-        # Make Polymarket predict big moves as well
+        # --- Polymarket 概率：均值回归 + 偶发突变 ---
+        # 注意：原版使用未来收益注入完美预测，存在前视偏差
+        # 修正版：使用均值回归 + 随机事件驱动
         poly = np.zeros(n); poly[0] = 0.5
         for i in range(1, n):
-            if fwd_returns[i] > 0.03:
-                poly[i] = np.clip(poly[i-1] + 0.20, 0.02, 0.98) # Sudden jump up
-            elif fwd_returns[i] < -0.03:
-                poly[i] = np.clip(poly[i-1] - 0.20, 0.02, 0.98) # Sudden jump down
+            # 均值回归
+            mean_revert = (0.5 - poly[i-1]) * 0.02
+            # 随机扰动
+            noise = np.random.normal(0, 0.03)
+            # 偶发突变事件（约 2% 概率）
+            if np.random.random() < 0.02:
+                shock = np.random.choice([-0.15, 0.15])
             else:
-                poly[i] = np.clip(poly[i-1] + np.random.normal(0, 0.02), 0.02, 0.98)
-        poly = np.clip(poly, 0.02, 0.98)
+                shock = 0
+            poly[i] = np.clip(poly[i-1] + mean_revert + noise + shock, 0.02, 0.98)
 
         # --- 主观叙事评分 ---
         narrative = np.clip(np.random.normal(0, 0.3, n), -1, 1)

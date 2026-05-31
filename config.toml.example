@@ -1,0 +1,183 @@
+# Aegis Quantum Strategy 配置文件
+# 复制为 config.toml 并填入你的配置
+
+# ============================================
+# 交易所配置 (支持多交易所)
+# ============================================
+[exchange]
+# 单个交易所快捷配置
+name = "okx"
+api_key = ""
+secret = ""
+passphrase = ""
+# 模拟盘模式 (true/false)
+demo = false
+
+# 或多交易所同时使用 (注释上面 name/api_key/secret, 取消注释下面)
+# [exchange.names]
+# names = ["okx", "binance", "gate"]
+
+# [exchange.okx]
+# api_key = ""
+# secret = ""
+# passphrase = ""
+
+# [exchange.binance]
+# api_key = ""
+# secret = ""
+
+# [exchange.gate]
+# api_key = ""
+# secret = ""
+
+# ============================================
+# AI 模型配置
+# ============================================
+[ai]
+# 默认使用 deepseek (便宜)，复杂任务用 gpt/claude
+default_provider = "deepseek"
+
+[ai.api_keys]
+deepseek = ""
+openai = ""
+anthropic = ""
+google = ""
+
+# 任务路由配置
+[ai.routing]
+market_analysis = "deepseek"      # 市场分析
+signal_generation = "deepseek"    # 信号生成
+risk_assessment = "openai"        # 风险评估
+strategy_review = "anthropic"     # 策略复核
+emergency_decision = "openai"     # 紧急决策
+
+# ============================================
+# 策略配置
+# ============================================
+[strategy]
+# 目标波动率
+target_vol = 0.50
+# 最大日仓位变化
+max_daily_delta_change = 0.25
+# 交易成本 (6 bps)
+trade_cost = 0.0006
+
+# 四层信号权重
+[strategy.weights]
+L1 = 0.35  # 宏观层 (VIX)
+L2 = 0.40  # 链上层 (Funding/OI)
+L3 = 0.15  # 预测市场 (Polymarket)
+L4 = 0.10  # 叙事层
+
+# ============================================
+# 风控配置
+# ============================================
+[risk]
+# VIX 熔断阈值
+vix_halt = 40
+# 最大回撤熔断
+max_drawdown_halt = -0.15
+# 单日最大亏损
+max_daily_loss = -0.05
+# 冷却期天数
+cooldown_days = 3
+
+# 回撤分级降仓
+[risk.drawdown_tiers]
+-0.03 = 1.0   # 回撤 3%: 正常仓位
+-0.06 = 0.75  # 回撤 6%: 降仓 25%
+-0.10 = 0.50  # 回撤 10%: 降仓 50%
+-0.15 = 0.25  # 回撤 15%: 降仓 75%
+
+# ============================================
+# 仓位管理配置
+# ============================================
+[position]
+# Kelly 系数乘数 (半 Kelly)
+half_kelly = 0.5
+# 最大杠杆
+max_leverage = 3.0
+# ATR 止损倍数
+atr_stop_mult = 2.0
+
+# 止盈分级
+[position.take_profit]
+1.5 = 0.50  # 1.5x ATR: 平 50%
+3.0 = 0.30  # 3.0x ATR: 平 30%
+5.0 = 0.20  # 5.0x ATR: 平剩余 20%
+
+# ============================================
+# 通知配置 (多通道)
+# ============================================
+[notify]
+# 启用的渠道
+enabled_channels = ["telegram"]
+
+# Telegram
+[notify.channels.telegram]
+enabled = true
+bot_token = ""
+chat_id = ""
+
+# 企业微信
+[notify.channels.wechat]
+enabled = false
+webhook_url = ""
+
+# Discord
+[notify.channels.discord]
+enabled = false
+webhook_url = ""
+
+# QQ Bot (OneBot 协议)
+[notify.channels.qq]
+enabled = false
+api_url = "http://localhost:5700"
+user_id = ""
+token = ""
+
+# 邮件 (Gmail/SMTP)
+[notify.channels.email]
+enabled = false
+smtp_host = "smtp.gmail.com"
+smtp_port = 587
+username = ""
+password = ""
+to = ""
+
+# ============================================
+# 数据配置
+# ============================================
+[data]
+# 数据源: okx / csv
+source = "okx"
+# CSV 文件路径 (当 source=csv 时)
+csv_path = "user_real_data.csv"
+# 默认交易对
+symbol = "BTC-USDT-SWAP"
+# 历史数据起始日期
+start_date = "2022-01-01"
+
+# ============================================
+# 自动进化配置
+# ============================================
+[evolution]
+# 是否自动生成 SKILL.md
+auto_generate = true
+# 进化所需的最低交易笔数
+min_trades = 10
+# 默认止损百分比
+stop_loss = 3.0
+# 默认止盈百分比
+take_profit = 5.0
+# 最大杠杆
+max_leverage = 5
+# 单笔风险占资金比例
+risk_per_trade = 2.0
+
+# ============================================
+# 引擎配置
+# ============================================
+[engine]
+# 轮询间隔 (秒)
+interval_seconds = 300

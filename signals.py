@@ -86,33 +86,12 @@ class SignalAggregator:
     返回 (target_exposure, raw_z)
     """
     def __init__(self, target_vol: float = 0.50, config: dict = None, base_weights: dict = None):
-        # 基础权重定义，可覆盖
         default_weights = {'L1': 0.35, 'L2': 0.40, 'L3': 0.15, 'L4': 0.10}
         self.base_weights = base_weights if base_weights is not None else default_weights
-        # 动态加权开关与参数
         self.dynamic_weighting = True
-        self.weight_alpha = 0.5  # 权重波动灵敏度
+        self.weight_alpha = 0.5
         self.weights = self.base_weights.copy()
-        self.recent_z_buffer = []  # 用于动态加权的 Z‑score 缓冲区
-        self.target_vol = target_vol
-        self.config = config or {
-            'vix_circuit_breaker': 40,
-            'vix_risk_threshold': 30,
-            'vix_risk_multiplier': 0.3,
-            'pullback_long': {'severe': (-0.12, 0.35),
-                             'moderate': (-0.08, 0.60),
-                             'mild': (-0.02, 1.10)},
-            'pullback_short': {'severe': (-0.10, 0.45),
-                              'moderate': (-0.06, 0.70),
-                              'mild': (-0.02, 1.05)}
-        }
-        # 基础权重定义
-        self.base_weights = {'L1': 0.35, 'L2': 0.40, 'L3': 0.15, 'L4': 0.10}
-        # 动态加权开关与参数
-        self.dynamic_weighting = True
-        self.weight_alpha = 0.5  # 权重波动灵敏度
-        self.weights = self.base_weights.copy()
-        self.recent_z_buffer = []  # 用于动态加权的 Z‑score 缓冲区
+        self.recent_z_buffer = []
         self.target_vol = target_vol
         self.config = config or {
             'vix_circuit_breaker': 40,

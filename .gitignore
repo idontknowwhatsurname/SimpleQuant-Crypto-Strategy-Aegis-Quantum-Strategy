@@ -25,3 +25,4 @@ dashboard.html
 .vscode/
 .idea/
 .DS_Store
+*.dmg
